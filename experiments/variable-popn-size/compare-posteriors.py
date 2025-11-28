@@ -23,7 +23,7 @@ from torch import Tensor
 from sbi.inference import DirectPosterior
 from sbi.utils import BoxUniform
 
-# Add popgensbi scripts to load path
+# Add popgen-npe scripts to load path
 current_dir = os.path.dirname(os.path.abspath(__file__))
 project_root = current_dir
 while not os.path.exists(os.path.join(project_root, "workflow", "scripts")):

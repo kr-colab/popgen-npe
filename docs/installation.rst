@@ -1,7 +1,7 @@
 Installation
 ============
 
-To install PopGenSBI, follow these steps:
+To install popgen-npe, follow these steps:
 
 1. **Clone the repository**
 
@@ -9,7 +9,7 @@ To install PopGenSBI, follow these steps:
 
    .. code-block:: bash
 
-       git clone https://github.com/kr-colab/popgensbi_snakemake.git
+       git clone https://github.com/kr-colab/popgen-npe.git
 
 2. **Navigate to the project directory**
 
@@ -17,7 +17,7 @@ To install PopGenSBI, follow these steps:
 
    .. code-block:: bash
 
-       cd popgensbi_snakemake
+       cd popgen-npe
 
 3. **Create a conda environment**
 
@@ -33,15 +33,15 @@ To install PopGenSBI, follow these steps:
 
    .. code-block:: bash
 
-       conda activate popgensbi_env
+       conda activate popgen-npe_env
 
 5. **Development Dependencies (if necessary)**
 
-   If you want to develop PopGenSBI, we have a separate set of dependencies
+   If you want to develop popgen-npe, we have a separate set of dependencies
    in a conda environment. To install these dependencies, run the following command:
 
    .. code-block:: bash
 
        conda env create -f requirements-dev.yaml
 
-Now you are ready to use PopGenSBI for your simulation-based inference tasks in population genetics!
+Now you are ready to use popgen-npe for your simulation-based inference tasks in population genetics!

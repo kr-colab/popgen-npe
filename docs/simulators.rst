@@ -6,7 +6,7 @@ The simulator module provides classes for generating population genetic simulati
 Overview
 --------
 
-Simulators in popgensbi are responsible for:
+Simulators in popgen-npe are responsible for:
 
 - Generating tree sequences under specified demographic models
 - Sampling parameters from prior distributions

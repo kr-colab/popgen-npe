@@ -5,7 +5,7 @@ import sys
 sys.path.insert(0, os.path.abspath(".."))
 
 # Project information
-project = "popgensbi_snakemake"
+project = "popgen-npe"
 copyright = "2025"
 author = "Andrew Kern"
 release = "0.1.0"
