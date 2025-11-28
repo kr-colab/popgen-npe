@@ -25,13 +25,13 @@ conda env create -f environment.yaml
 
 To run the workflow, you first need to create a config file containing the details of 
 the simulation and inference you want to perform. An example of such a config file is
-contained in `workflow/AraTha_2epoch_cnn.yaml`. This config file is used to run the
+contained in `workflow/config/AraTha_2epoch_cnn.yaml`. This config file is used to run the
 neural posterior estimation of a two-epoch demographic model with a CNN embedding network.
 
 To run the workflow, you can use the following command:
 
 ```bash
-snakemake --configfile config/AraTha_2epoch_cnn.yaml --snakefile workflow/training_workflow.smk
+snakemake --configfile workflow/config/AraTha_2epoch_cnn.yaml --snakefile workflow/training_workflow.smk
 ```
 
 ## Simulate data for VCF prediction
@@ -50,7 +50,7 @@ python resources/util/simulate-vcf.py \
 To generate predictions along windows in the VCF,
 
 ```bash
-snakemake --configfile config/AraTha_2epoch_cnn.yaml --snakefile workflow/prediction_workflow.smk
+snakemake --configfile workflow/config/AraTha_2epoch_cnn.yaml --snakefile workflow/prediction_workflow.smk
 ```
 
 TODO: more details on input files, when this is finalized
@@ -64,7 +64,7 @@ which is meant to be used with the SLURM cluster at University of Oregon.
 To use this profile, you can run the following command:
 
 ```bash
-snakemake --executor slurm --configfile config/AraTha_2epoch_cnn.yaml --workflow-profile ~/.config/snakemake/yourprofile/ --snakefile workflow/Snakefile
+snakemake --executor slurm --configfile workflow/config/AraTha_2epoch_cnn.yaml --workflow-profile ~/.config/snakemake/yourprofile/ --snakefile workflow/training_workflow.smk
 ```
 note:
 The profile used in the workflow assumes snakemake version 8.X. If you are using a different version, you may have to change the profile.

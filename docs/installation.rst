@@ -25,7 +25,7 @@ To install popgen-npe, follow these steps:
 
    .. code-block:: bash
 
-       conda env create -f workflow/environment.yaml
+       conda env create -f environment.yaml
 
 4. **Activate the environment**
 
@@ -34,14 +34,5 @@ To install popgen-npe, follow these steps:
    .. code-block:: bash
 
        conda activate popgen-npe_env
-
-5. **Development Dependencies (if necessary)**
-
-   If you want to develop popgen-npe, we have a separate set of dependencies
-   in a conda environment. To install these dependencies, run the following command:
-
-   .. code-block:: bash
-
-       conda env create -f requirements-dev.yaml
 
 Now you are ready to use popgen-npe for your simulation-based inference tasks in population genetics!

@@ -10,13 +10,14 @@ or a high performance computing cluster. The entire pipeline is managed by the S
 
 Important files in this package include:
 
-- ``workflow/Snakefile``: The main workflow file. This file contains the rules and
-  functions that define the workflow, executing a complete neural posterior
+- ``workflow/training_workflow.smk``: The main training workflow file. This file contains the rules and
+  functions that define the training workflow, executing a complete neural posterior
   estimation process based on a given configuration.
-- ``workflow/environment.yaml``: The Conda environment file for the workflow that lists all necessary dependencies.
+- ``workflow/prediction_workflow.smk``: The prediction workflow file for running inference on VCF data.
+- ``environment.yaml``: The Conda environment file for the workflow that lists all necessary dependencies.
 
 In addition, the workflow relies on a configuration file (in YAML format) that contains the parameters for both
-simulation and inference. For example, the file ``workflow/AraTha_2epoch_cnn.yaml`` is used to run neural
+simulation and inference. For example, the file ``workflow/config/AraTha_2epoch_cnn.yaml`` is used to run neural
 posterior estimation for a two-epoch demographic model with a CNN embedding network.
 
 Basic Usage
@@ -26,9 +27,15 @@ To run the workflow, use the following command:
 
 .. code-block:: bash
 
-    snakemake --configfile workflow/AraTha_2epoch_cnn.yaml --snakefile workflow/Snakefile
+    snakemake --configfile workflow/config/AraTha_2epoch_cnn.yaml --snakefile workflow/training_workflow.smk
 
-This command will execute the entire pipeline—from simulation to neural posterior estimation.
+This command will execute the entire training pipeline—from simulation to neural posterior estimation.
+
+To run inference on VCF data using a trained model:
+
+.. code-block:: bash
+
+    snakemake --configfile workflow/config/AraTha_2epoch_cnn.yaml --snakefile workflow/prediction_workflow.smk
 
 Configuration Files
 -------------------
