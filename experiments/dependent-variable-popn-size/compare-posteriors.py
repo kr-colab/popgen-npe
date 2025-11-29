@@ -29,7 +29,7 @@ from torch import Tensor
 from sbi.inference import DirectPosterior
 from sbi.utils import BoxUniform
 
-# Add popgensbi scripts to load path
+# Add popgen-npe scripts to load path
 current_dir = os.path.dirname(os.path.abspath(__file__))
 project_root = current_dir
 while not os.path.exists(os.path.join(project_root, "workflow", "scripts")):
@@ -170,8 +170,8 @@ Examples:
         type=str,
         required=True,
         help="Path to tree sequence file (.trees) for legacy mode. "
-             "If per-config simulations exist in output/simulated_data_<LABEL>/, "
-             "those will be used instead.",
+        "If per-config simulations exist in output/simulated_data_<LABEL>/, "
+        "those will be used instead.",
     )
     parser.add_argument(
         "--parameters", type=str, required=True, help="Path to parameters file (YAML)"
@@ -208,10 +208,7 @@ Examples:
     if args.labels:
         labels = args.labels
     else:
-        labels = [
-            os.path.splitext(os.path.basename(cfg))[0]
-            for cfg in args.configs
-        ]
+        labels = [os.path.splitext(os.path.basename(cfg))[0] for cfg in args.configs]
 
     # Set random seeds
     rng = np.random.default_rng(args.seed)

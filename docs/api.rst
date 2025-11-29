@@ -1,7 +1,7 @@
 API Reference
 =================
 
-This section provides detailed API documentation for the popgensbi package modules.
+This section provides detailed API documentation for the popgen-npe package modules.
 
 Tree Sequence Processors
 ------------------------

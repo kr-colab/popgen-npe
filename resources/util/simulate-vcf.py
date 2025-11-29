@@ -10,8 +10,10 @@ import pysam
 import pysam.bcftools
 import textwrap
 
-# put popgensbi_snakemake scripts in the load path
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", "workflow", "scripts"))
+# put popgen-npe scripts in the load path
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "..", "workflow", "scripts")
+)
 import ts_simulators
 
 parser = argparse.ArgumentParser(
@@ -20,28 +22,52 @@ parser = argparse.ArgumentParser(
     "and true parameter values. Assumes the simulator has a `sequence_length` "
     "attribute that can be overridden."
 )
-parser.add_argument("--configfile", help="Config file used for snakemake training workflow", type=str, required=True)
-parser.add_argument("--outpath", help="Path to output directory", type=str, required=True)
-parser.add_argument("--num-contig", help="Number of contigs in VCF (eg chromosomes)", type=int, default=3)
-parser.add_argument("--sequence-length", help="Size of contigs (eg chromosome length)", type=float, default=10e6)
-parser.add_argument("--window-size", help="Size of windows in bp", type=int, default=1e6)
-parser.add_argument("--seed", help="Random seed passed to simulator", type=int, default=1024)
+parser.add_argument(
+    "--configfile",
+    help="Config file used for snakemake training workflow",
+    type=str,
+    required=True,
+)
+parser.add_argument(
+    "--outpath", help="Path to output directory", type=str, required=True
+)
+parser.add_argument(
+    "--num-contig",
+    help="Number of contigs in VCF (eg chromosomes)",
+    type=int,
+    default=3,
+)
+parser.add_argument(
+    "--sequence-length",
+    help="Size of contigs (eg chromosome length)",
+    type=float,
+    default=10e6,
+)
+parser.add_argument(
+    "--window-size", help="Size of windows in bp", type=int, default=1e6
+)
+parser.add_argument(
+    "--seed", help="Random seed passed to simulator", type=int, default=1024
+)
 args = parser.parse_args()
 
 
 # parse the config, instantiate the simulator
-if not os.path.exists(args.outpath): os.makedirs(args.outpath)
+if not os.path.exists(args.outpath):
+    os.makedirs(args.outpath)
 config = yaml.safe_load(open(args.configfile))
 simulator_config = config["simulator"]
 simulator = getattr(ts_simulators, simulator_config["class_name"])(simulator_config)
-assert hasattr(simulator, "sequence_length"), "Simulator lacks `sequence_length` attribute"
+assert hasattr(
+    simulator, "sequence_length"
+), "Simulator lacks `sequence_length` attribute"
 simulator.sequence_length = args.sequence_length
 
 
 ## condition the simulator on particular parameter values
-#torch.manual_seed(args.seed)
-#theta = simulator.prior.sample()
-#for i, p in enumerate(simulator.parameters):  # set prior to point mass
+# torch.manual_seed(args.seed)
+# theta = simulator.prior.sample()
+# for i, p in enumerate(simulator.parameters):  # set prior to point mass
 #    setattr(simulator, p, [theta[i].item()] * 2)
 # TODO: would need to regenerate the simulator here
 
@@ -101,7 +127,8 @@ bedfile.close()
 pysam.tabix_compress(fa_path, fa_path + ".gz", force=True)
 pysam.bcftools.concat(*tmp_path, "-o", vcf_path, catch_stdout=False)
 pysam.tabix_index(vcf_path, preset="vcf", force=True)
-for vcf in tmp_path: os.remove(vcf)
+for vcf in tmp_path:
+    os.remove(vcf)
 os.remove(fa_path)
 
 
@@ -110,5 +137,5 @@ pop_map = {i: p.metadata["name"] for i, p in enumerate(ts.populations())}
 meta = open(os.path.join(args.outpath, f"popmap.yaml"), "w")
 for ind in ts.individuals():
     i, p = ind.id, ind.population
-    meta.write(f"{indv_names[i]}: \"{pop_map[p]}\"\n")
+    meta.write(f'{indv_names[i]}: "{pop_map[p]}"\n')
 meta.close()

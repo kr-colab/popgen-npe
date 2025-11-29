@@ -1,4 +1,4 @@
-Welcome to PopGenSBI's documentation!
+Welcome to popgen-npe's documentation!
 =====================================
 
 .. toctree::

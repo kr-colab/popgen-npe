@@ -6,14 +6,14 @@ The simulator module provides classes for generating population genetic simulati
 Overview
 --------
 
-Simulators in popgensbi are responsible for:
+Simulators in popgen-npe are responsible for:
 
 - Generating tree sequences under specified demographic models
 - Sampling parameters from prior distributions
 - Simulating both ancestry and mutations
 - Ensuring consistent random seeding for reproducibility
 
-All simulators inherit from ``BaseSimulator`` and follow a consistent interface, making them interchangeable within the workflow.
+All simulators inherit from ``BaseSimulator`` and follow a consistent interface, making them interchangeable within the workflow. Unless otherwise noted, each parameter listed below is sampled uniformly over the given bounds and stored exactly as drawn in the ``targets`` array. Models that work in log10 space (e.g., the variable population-size simulators) return log10-transformed population sizes so downstream analyses must exponentiate them when real sizes are required.
 
 Base Simulator
 --------------
@@ -76,11 +76,58 @@ YRI_CEU
 
       simulator:
         class_name: YRI_CEU
-        parameters:
-          samples:
-            YRI: 20
-            CEU: 20
-          sequence_length: 5e6
+        sequence_length: 5e6
+        samples:
+          YRI: 20
+          CEU: 20
+
+DroMel_CO_FR
+~~~~~~~~~~~~~
+
+.. autoclass:: DroMel_CO_FR
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+   Simulates a two-population isolation-with-migration model for *Drosophila melanogaster*,
+   with Cameroonian (CO) and French (FR) populations, including exponential growth in the French population.
+
+   **Model Description:**
+
+   1. Ancestral population of size N_ANC
+   2. Split into CO and FR populations at time T
+   3. FR population undergoes exponential growth from N_FR0 to N_FR1
+   4. CO population maintains constant size N_CO
+   5. Asymmetric migration between populations (m_CO_FR, m_FR_CO)
+
+   **Fixed Parameters:**
+
+   - ``samples``: {"CO": 10, "FR": 10}
+   - ``sequence_length``: 1e6
+   - ``recombination_rate``: [0.5e-8, 3.0e-8] (sampled uniformly)
+   - ``mutation_rate``: 5.49e-9
+   - ``haploid``: True
+
+   **Inferred Parameters (uniform priors in log10 space):**
+
+   - ``N_ANC``: [3.5, 6.5] - log10 ancestral population size
+   - ``N_CO``: [3.5, 6.5] - log10 Cameroonian population size
+   - ``N_FR0``: [3.5, 6.5] - log10 French population size after split
+   - ``N_FR1``: [3.5, 6.5] - log10 French population size after growth
+   - ``T``: [3, 6] - log10 split time
+   - ``m_CO_FR``: [-8, -3] - log10 migration rate from Cameroonian to French
+   - ``m_FR_CO``: [-8, -3] - log10 migration rate from French to Cameroonian
+
+   **Example Configuration:**
+
+   .. code-block:: yaml
+
+      simulator:
+        class_name: DroMel_CO_FR
+        sequence_length: 2e6
+        samples:
+          CO: 20
+          FR: 20
 
 AraTha_2epoch
 ~~~~~~~~~~~~~
@@ -117,10 +164,9 @@ AraTha_2epoch
 
       simulator:
         class_name: AraTha_2epoch
-        parameters:
-          samples:
-            SouthMiddleAtlas: 15
-          sequence_length: 1e7
+        sequence_length: 1e7
+        samples:
+          SouthMiddleAtlas: 15
 
 VariablePopulationSize
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -133,14 +179,14 @@ VariablePopulationSize
    Simulates a single population with multiple size changes across time windows.
 
    **Model Description:**
-   
+
    1. Single population with size changes at fixed time intervals
-   2. Time points are exponentially spaced using the formula: ((exp(log(1 + rate*max_time) * i/(n-1)) - 1) / rate)
-   3. Population sizes are sampled independently for each time window
+   2. Time points are logarithmically spaced using ``np.logspace(2, log10(max_time), num_time_windows)`` with the first time point set to 0
+   3. Population sizes are sampled independently for each time window (in log10 space)
    4. Ensures minimum number of SNPs (400) after MAF filtering
 
    **Fixed Parameters:**
-   
+
    - ``samples``: {"pop": 10}
    - ``sequence_length``: 10e6
    - ``mutation_rate``: 1.5e-8
@@ -150,8 +196,10 @@ VariablePopulationSize
 
    **Inferred Parameters (uniform priors):**
    
-   - ``N_0, N_1, ..., N_{n-1}``: [1e2, 1e5] - Population sizes (log10 space)
-   - ``recomb_rate``: [1e-9, 1e-7] - Recombination rate
+   - ``N_0, N_1, ..., N_{n-1}``: log10 population sizes sampled between ``log10(pop_sizes[0])`` and ``log10(pop_sizes[1])`` (defaults: 2–5, corresponding to 1e2–1e5)
+   - ``recomb_rate``: [1e-9, 2e-8] - Recombination rate
+
+   The parameter vector returned by this simulator stores log10 population sizes; exponentiate to obtain sizes in diploid individuals.
 
    **Example Configuration:**
 
@@ -159,10 +207,58 @@ VariablePopulationSize
 
       simulator:
         class_name: VariablePopulationSize
-        parameters:
-          num_time_windows: 5
-          pop_sizes: [1e3, 1e6]
-          max_time: 50000
+        num_time_windows: 5
+        pop_sizes: [1e3, 1e6]
+        max_time: 50000
+
+DependentVariablePopulationSize
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: DependentVariablePopulationSize
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+   Simulates a single population with correlated size changes across time windows.
+   Unlike ``VariablePopulationSize``, each population size depends on the previous one,
+   creating a correlated random walk in log-space.
+
+   **Model Description:**
+
+   1. Single population with 21 time windows (by default)
+   2. Time points are exponentially spaced using: ``((exp(log(1 + rate*max_time) * i/(n-1)) - 1) / rate)``
+   3. First population size N_0 is sampled uniformly in log10 space
+   4. Subsequent sizes follow: N_i = N_{i-1} * 10^beta, where beta is sampled from [-1, 1]
+   5. Population sizes are clamped to stay within the specified bounds
+   6. Ensures minimum number of SNPs (400) after MAF filtering
+
+   **Fixed Parameters:**
+
+   - ``samples``: {"pop0": 25}
+   - ``sequence_length``: 2e6
+   - ``mutation_rate``: 1e-8
+   - ``num_time_windows``: 21
+   - ``maf``: 0.05
+   - ``max_time``: 130000
+   - ``time_rate``: 0.1
+
+   **Inferred Parameters:**
+
+   - ``N_0, N_1, ..., N_{n-1}``: log10 population sizes (defaults span log10(1e2)–log10(1e5)); correlations are induced via ``pop_changes`` increments sampled uniformly in log10 space
+   - ``recomb_rate``: [1e-9, 1e-8] - Recombination rate
+
+   The simulator returns log10-transformed population sizes; exponentiate them (base 10) to recover effective population sizes in standard units.
+
+   **Example Configuration:**
+
+   .. code-block:: yaml
+
+      simulator:
+        class_name: DependentVariablePopulationSize
+        num_time_windows: 21
+        pop_sizes: [1e2, 1e5]
+        pop_changes: [-0.5, 0.5]
+        max_time: 100000
 
 recombination_rate
 ~~~~~~~~~~~~~~~~~~
@@ -195,26 +291,24 @@ recombination_rate
 
       simulator:
         class_name: recombination_rate
-        parameters:
-          pop_size: 5e4
-          sequence_length: 5e6
+        pop_size: 5e4
+        sequence_length: 5e6
 
 Usage in Configuration Files
 ----------------------------
 
 Simulators are specified in the workflow configuration YAML files:
 
-.. code-block:: yaml
+   .. code-block:: yaml
 
-   simulator:
-     class_name: YRI_CEU  # Name of the simulator class
-     parameters:          # Override default parameters
-       sequence_length: 5e6
-       samples:
-         YRI: 20
-         CEU: 20
+      simulator:
+        class_name: YRI_CEU  # Name of the simulator class
+        sequence_length: 5e6
+        samples:
+          YRI: 20
+          CEU: 20
 
-The ``class_name`` must match one of the available simulator classes. Parameters specified in the configuration will override the defaults.
+   The ``class_name`` must match one of the available simulator classes. All other keys under ``simulator`` must correspond to attributes listed in the simulator's ``default_config``; values provided here override those defaults. Supplying unused keys will raise an error during configuration parsing.
 
 Creating Custom Simulators
 --------------------------
