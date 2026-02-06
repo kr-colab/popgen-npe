@@ -38,6 +38,8 @@ def write_multihetsep(ts, output_path, chrom_name="1"):
     with open(output_path, 'w') as f:
         prev_pos = 0
         for var in ts.variants():
+            if var.genotypes.max() > 1:
+                continue
             cur_pos = int(var.site.position)
             if cur_pos > prev_pos:
                 span = cur_pos - prev_pos
