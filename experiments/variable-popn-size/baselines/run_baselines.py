@@ -31,7 +31,8 @@ SCENARIOS = {
 MUTATION_RATE = 1.5e-8
 
 
-def run_all_baselines(scenarios=None, output_dir=None, msmc2_path=MSMC2_DEFAULT):
+def run_all_baselines(scenarios=None, output_dir=None, msmc2_path=MSMC2_DEFAULT,
+                      seed=42):
     if scenarios is None:
         scenarios = list(SCENARIOS.keys())
     if output_dir is None:
@@ -40,7 +41,13 @@ def run_all_baselines(scenarios=None, output_dir=None, msmc2_path=MSMC2_DEFAULT)
     output_dir = Path(output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    results = {}
+    # Load existing results to preserve other scenarios when running a subset
+    output_file = output_dir / "baseline_results.pkl"
+    if output_file.exists():
+        with open(output_file, 'rb') as f:
+            results = pickle.load(f)
+    else:
+        results = {}
 
     for scenario in scenarios:
         print(f"\n{'='*60}")
@@ -58,14 +65,14 @@ def run_all_baselines(scenarios=None, output_dir=None, msmc2_path=MSMC2_DEFAULT)
 
         msmc2_dir = output_dir / scenario / "msmc2"
 
-        print(f"\n  Running MSMC2...")
+        print(f"\n  Running MSMC2 (seed={seed})...")
         try:
             msmc2_results = run_msmc2_pipeline(
                 ts,
                 msmc2_dir,
                 mutation_rate=MUTATION_RATE,
-                n_diploids=1,
-                seed=42,
+                n_diploids=10,
+                seed=seed,
                 msmc2_path=msmc2_path,
                 n_threads=20,
                 iterations=18,
@@ -78,7 +85,6 @@ def run_all_baselines(scenarios=None, output_dir=None, msmc2_path=MSMC2_DEFAULT)
             print(f"  MSMC2 failed: {e}")
             results[scenario] = {'msmc2': None}
 
-    output_file = output_dir / "baseline_results.pkl"
     with open(output_file, 'wb') as f:
         pickle.dump(results, f)
     print(f"\nResults saved to: {output_file}")
@@ -91,12 +97,14 @@ def main():
     parser.add_argument("--scenarios", nargs="+", choices=list(SCENARIOS.keys()), default=None)
     parser.add_argument("--output-dir", type=str, default=None)
     parser.add_argument("--msmc2-path", type=str, default=MSMC2_DEFAULT)
+    parser.add_argument("--seed", type=int, default=42)
     args = parser.parse_args()
 
     run_all_baselines(
         scenarios=args.scenarios,
         output_dir=args.output_dir,
         msmc2_path=args.msmc2_path,
+        seed=args.seed,
     )
 
 

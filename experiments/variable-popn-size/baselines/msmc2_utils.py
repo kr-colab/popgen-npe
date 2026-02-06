@@ -214,7 +214,8 @@ def parse_msmc2_final_file(results_file, mutation_rate):
 
 def parse_msmc2_loop_file(results_file, mutation_rate):
     """
-    Parse MSMC2 .loop.txt format and extract final iteration results.
+    Parse MSMC2 .loop.txt format and extract the iteration with the best
+    log likelihood.
 
     Loop file format (tab-separated):
     recombination_rate  log_likelihood  time_boundaries  ne_values
@@ -222,11 +223,18 @@ def parse_msmc2_loop_file(results_file, mutation_rate):
     Where time_boundaries and ne_values are comma-separated strings.
     """
     with open(results_file, 'r') as f:
-        lines = f.readlines()
+        lines = [l.strip() for l in f.readlines() if l.strip()]
 
-    # Get the last (most converged) iteration
-    last_line = lines[-1].strip()
-    parts = last_line.split('\t')
+    # Find iteration with best (highest) log likelihood
+    best_idx = 0
+    best_ll = -np.inf
+    for i, line in enumerate(lines):
+        ll = float(line.split('\t')[1])
+        if ll > best_ll:
+            best_ll = ll
+            best_idx = i
+
+    parts = lines[best_idx].split('\t')
 
     # Parse time boundaries (scaled)
     time_boundaries_str = parts[2]
