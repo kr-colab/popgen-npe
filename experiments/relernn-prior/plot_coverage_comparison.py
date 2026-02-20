@@ -8,6 +8,9 @@ import argparse
 import numpy as np
 from matplotlib.ticker import ScalarFormatter
 
+plt.rcParams["figure.dpi"] = 300
+plt.rcParams["savefig.dpi"] = 300
+
 parser = argparse.ArgumentParser(docstring)
 parser.add_argument("--posterior-summary", type=str, 
     help="Pickled coverage estimates per model", 
@@ -31,18 +34,20 @@ training_size_map = {
     "100000": r"$10^5$",
 }
 prior_name_map = {
-    "true": "Exact prior\n" + r"Unif$(0, 3 \times 10^{-8})$",
-    "wide": "Under-concentrated prior\n" + r"Unif$(0, 10^{-7})$",
+    "true": "Exact prior\n" + r"$3 \times 10^{-8} \times$ Beta$(1, 1)$",
+    "wide": "Under-concentrated prior\n" + r"$10^{-7} \times$ Beta$(1, 1)$",
     "concentrated": "Over-concentrated prior\n" + r"$3 \times 10^{-8} \times$ Beta$(2, 2)$",
 }
 
 fig, axs = plt.subplots(2, 3, figsize=(8, 4.5), sharex=True, sharey="row", constrained_layout=True)
-cmap = plt.get_cmap("magma")
+cmap = plt.get_cmap("plasma")
 cdim = len(training_size_map)
 line_kwargs = {"markersize": 4}
+ref_line_kwargs = {"linestyle": "dashed", "color": "black", "linewidth": 1}
 
 # coverage
 for u, prior in enumerate(["true", "wide", "concentrated"]):
+    axs[0, u].axline((0,0), slope=1, **ref_line_kwargs)
     for i, training_size in enumerate(["100", "1000", "10000"]):
         config_name = f"npe-config/ReLERNN_{prior}_{training_size}.yaml"
         df = data[config_name]
@@ -58,15 +63,15 @@ for u, prior in enumerate(["true", "wide", "concentrated"]):
             label=training_size_map[training_size], color=cmap((i+1)/cdim), 
             **line_kwargs,
         )
-    axs[0, u].axline((0,0), slope=1, linestyle="dashed", color="gray")
     axs[0, u].set_title(prior_name_map[prior], size=10)
     axs[0, u].set_ylim(0, 1.0)
+    #axs[0, u].tick_params(axis="both", labelsize=8)
     if u == 0:
         axs[0, u].set_ylabel("Posterior\ninterval coverage")
 
 # concentration
-line_kwargs = {"markersize": 4}
 for u, prior in enumerate(["true", "wide", "concentrated"]):
+    axs[1, u].axhline(y=1.0, **ref_line_kwargs)
     for i, training_size in enumerate(["100", "1000", "10000"]):
         config_name = f"npe-config/ReLERNN_{prior}_{training_size}.yaml"
         df = data[config_name]
@@ -87,15 +92,15 @@ for u, prior in enumerate(["true", "wide", "concentrated"]):
             color=cmap((i+1)/cdim), 
             **line_kwargs,
         )
-    axs[1, u].axhline(y=1.0, linestyle="dashed", color="gray")
     axs[1, u].set_xticks([0.0, 0.2, 0.4, 0.6, 0.8, 1.0])
     axs[1, u].set_xlim(0, 1.0)
     axs[1, u].set_ylim(0.1, 10.0)
     axs[1, u].set_yscale("log")
     axs[1, u].set_yticks([0.1, 1, 10])
     axs[1, u].set_yticklabels(["0.1", "1", "10"])
+    #axs[1, u].tick_params(axis="both", labelsize=8)
     if u == 0:
-        axs[1, u].set_ylabel("Posterior / true\ninterval width")
+        axs[1, u].set_ylabel("Posterior / exact prior\ninterval width")
 
 handles, labels = axs[0, 0].get_legend_handles_labels()
 fig.legend(handles, labels, title="Training set size", loc="outside right", frameon=False)
