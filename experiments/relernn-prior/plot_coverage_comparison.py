@@ -31,9 +31,9 @@ training_size_map = {
     "100000": r"$10^5$",
 }
 prior_name_map = {
-    "true": "Exact prior\n" + r"Unif$(0, 10^{-8})$",
-    "wide": "Less concentrated prior\n" + r"Unif$(0, 10^{-7})$",
-    "concentrated": "More concentrated prior\n" + r"$10^{-8} \times$ Beta$(2, 2)$",
+    "true": "Exact prior\n" + r"Unif$(0, 3 \times 10^{-8})$",
+    "wide": "Under-concentrated prior\n" + r"Unif$(0, 10^{-7})$",
+    "concentrated": "Over-concentrated prior\n" + r"$3 \times 10^{-8} \times$ Beta$(2, 2)$",
 }
 
 fig, axs = plt.subplots(2, 3, figsize=(8, 4.5), sharex=True, sharey="row", constrained_layout=True)
