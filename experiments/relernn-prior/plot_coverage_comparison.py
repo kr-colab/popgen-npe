@@ -18,8 +18,7 @@ parser.add_argument("--posterior-summary", type=str,
 )
 parser.add_argument("--output-path", type=str, 
     help="Where to save output plot", 
-    #default="/sietch_colab/data_share/popgen_npe/relernn_prior/coverage_comparison.png",
-    default="/home/natep/public_html/popgennpe/relernn_coverage_comparison.png",
+    default="/sietch_colab/data_share/popgen_npe/relernn_prior/relernn_prior_comparison.png",
 )
 args = parser.parse_args()
 
@@ -48,7 +47,7 @@ ref_line_kwargs = {"linestyle": "dashed", "color": "black", "linewidth": 1}
 # coverage
 for u, prior in enumerate(["true", "wide", "concentrated"]):
     axs[0, u].axline((0,0), slope=1, **ref_line_kwargs)
-    for i, training_size in enumerate(["100", "1000", "10000"]):
+    for i, training_size in enumerate(["100", "1000", "10000", "100000"]):
         config_name = f"npe-config/ReLERNN_{prior}_{training_size}.yaml"
         df = data[config_name]
         xax = 1 - 2 * df["alpha_grid"]
@@ -72,7 +71,7 @@ for u, prior in enumerate(["true", "wide", "concentrated"]):
 # concentration
 for u, prior in enumerate(["true", "wide", "concentrated"]):
     axs[1, u].axhline(y=1.0, **ref_line_kwargs)
-    for i, training_size in enumerate(["100", "1000", "10000"]):
+    for i, training_size in enumerate(["100", "1000", "10000", "100000"]):
         config_name = f"npe-config/ReLERNN_{prior}_{training_size}.yaml"
         df = data[config_name]
         xax = 1 - 2 * df["alpha_grid"]
