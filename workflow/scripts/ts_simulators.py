@@ -331,7 +331,8 @@ class VariablePopulationSize(BaseSimulator):
 class recombination_rate(BaseSimulator):
     """
     Simulate a one population model where recombination rate varies
-    among replicates 
+    among replicates. The prior is a beta distribution shifted/scaled
+    to a given interval (by default, a noninformative beta).
     """
 
     default_config = {
@@ -340,8 +341,9 @@ class recombination_rate(BaseSimulator):
         "sequence_length": 1e6,
         "mutation_rate": 1.5e-8,
         "pop_size": 1e4,
+        "mean_and_dispersion": [0.5, 0.5],  # beta mean and dispersion
         # RANDOM PARAMETERS (UNIFORM)
-        "recombination_rate": [0, 1e-8],
+        "recombination_rate": [0, 1e-8],  # bounds on recombination rate
     }
 
     def __init__(self, config: dict):
@@ -356,7 +358,11 @@ class recombination_rate(BaseSimulator):
     def __call__(self, seed: int = None) -> (tskit.TreeSequence, np.ndarray):
 
         torch.manual_seed(seed)
-        theta = self.prior.sample().numpy()
+        mean, dispersion = self.mean_and_dispersion
+        alpha, beta = mean / dispersion, (1 - mean) / dispersion
+        prior = torch.distributions.Beta(torch.FloatTensor([alpha]), torch.FloatTensor([beta]))
+        low, high = self.recombination_rate
+        theta = low + (high - low) * prior.sample().numpy()
         recombination_rate = theta.item()
 
         ts = msprime.sim_ancestry(
