@@ -26,7 +26,7 @@ optimizer: "Adam"
 batch_size: 32
 learning_rate: 0.0005
 max_num_epochs: 200
-stop_after_epochs: 100
+stop_after_epochs: 50
 clip_max_norm: 5
 packed_sequence: True
 
@@ -40,7 +40,7 @@ simulator:
 processor:
   class_name: "genotypes_and_distances"
   # OPTIONAL CLASS KWARGS:
-  max_snps: 2000
+  max_snps: 25000
   min_freq: 0.00
   max_freq: 1.00
 

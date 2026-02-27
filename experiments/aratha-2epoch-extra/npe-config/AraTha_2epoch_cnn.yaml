@@ -26,7 +26,7 @@ optimizer: "Adam"
 batch_size: 32
 learning_rate: 0.0005
 max_num_epochs: 200
-stop_after_epochs: 100
+stop_after_epochs: 50
 clip_max_norm: 5
 packed_sequence: False
 
@@ -40,7 +40,7 @@ simulator:
 processor:
   class_name: "cnn_extract"
   # OPTIONAL CLASS KWARGS:
-  n_snps: 2000
+  n_snps: 25000
   maf_thresh: 0.0
 
 embedding_network:
