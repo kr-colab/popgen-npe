@@ -1,0 +1,33 @@
+[project]
+name = "popgen-npe"
+version = "0.1.0"
+description = "Snakemake workflow for neural posterior estimation in population genetics"
+requires-python = ">=3.11"
+dependencies = [
+    "torch",
+    "torchvision",
+    "torchaudio",
+    "snakemake",
+    "sbi>=0.23.0",
+    "zarr<3.0.0",
+    "tsinfer>=0.4.0",
+    "tskit>=0.6.0",
+    "matplotlib",
+    "seaborn",
+    "dinf",
+    "snakemake-executor-plugin-slurm",
+    "moments-popgen",
+    "lightning",
+    "msprime",
+    "stdpopsim",
+    "pytest",
+    "pytest-xdist",
+    "scikit-allel",
+    "ray",
+    "bio2zarr",
+    "pysam",
+    "pyyaml",
+]
+
+[tool.uv]
+extra-index-url = ["https://download.pytorch.org/whl/cu118"]
