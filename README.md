@@ -19,7 +19,17 @@ The documentation covers simulator/processor APIs, configuration options, and us
 
 ## Environment setup
 
-Create and activate a Conda environment that includes Snakemake and the workflow dependencies:
+### For uv users (faster)
+
+```bash
+uv venv --python 3.11
+source .venv/bin/activate
+uv pip install -e .
+```
+
+For CPU-only (no CUDA), remove the `[tool.uv]` extra-index-url from `pyproject.toml` before installing.
+
+### For conda users
 
 ```bash
 conda env create -f environment.yaml
