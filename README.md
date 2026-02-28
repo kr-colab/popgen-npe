@@ -23,11 +23,7 @@ Create and activate a Conda environment that includes Snakemake and the workflow
 
 ```bash
 conda env create -f environment.yaml
-```
-
-```bash
-conda env create -f environment.yaml
-conda activate popgen-npe
+conda activate popgen_npe_env
 ```
 
 ## Training workflow
