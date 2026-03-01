@@ -1,38 +1,33 @@
 Installation
 ============
 
-To install popgen-npe, follow these steps:
+First, clone the repository and navigate to the project directory:
 
-1. **Clone the repository**
+.. code-block:: bash
 
-   Open a terminal and run the following command to clone the repository:
+    git clone https://github.com/kr-colab/popgen-npe.git
+    cd popgen-npe
 
-   .. code-block:: bash
+Then set up the environment using either uv or conda.
 
-       git clone https://github.com/kr-colab/popgen-npe.git
+For uv users (faster)
+---------------------
 
-2. **Navigate to the project directory**
+.. code-block:: bash
 
-   Change into the project directory:
+    uv venv --python 3.11
+    source .venv/bin/activate
+    uv pip install -e .
 
-   .. code-block:: bash
+For CPU-only (no CUDA), remove the ``[tool.uv]`` extra-index-url from
+``pyproject.toml`` before installing.
 
-       cd popgen-npe
+For conda users
+---------------
 
-3. **Create a conda environment**
+.. code-block:: bash
 
-   Create a new conda environment using the provided environment file:
+    conda env create -f environment.yaml
+    conda activate popgen_npe_env
 
-   .. code-block:: bash
-
-       conda env create -f environment.yaml
-
-4. **Activate the environment**
-
-   Activate the newly created environment:
-
-   .. code-block:: bash
-
-       conda activate popgen_npe_env
-
-Now you are ready to use popgen-npe for your simulation-based inference tasks in population genetics!
+You are now ready to use popgen-npe for your simulation-based inference tasks in population genetics!
