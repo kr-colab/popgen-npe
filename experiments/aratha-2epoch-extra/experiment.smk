@@ -293,7 +293,7 @@ rule calculate_mse:
                 axs[j, i].text(
                     0.02, 0.98, f"mse: {mse:.3f}", 
                     ha="left", va="top", transform=axs[j, i].transAxes,
-                    bbox=dict(facecolor='white', alpha=0.8, pad=0, edgecolor="none"),
+                    bbox=dict(facecolor='white', alpha=0.9, pad=0, edgecolor="none"),
                 )
                 axs[j, i].axline((0, 0), slope=1, linestyle="dashed", color="black")
             axs[0, i].set_xlim(SIZE_BOUNDS[0], SIZE_BOUNDS[1])
@@ -332,7 +332,7 @@ rule calculate_mse:
                 axs[j, i].text(
                     0.02, 0.98, f"mse: {mse:.3f}\nprior-mse: {baseline:.3f}", 
                     ha="left", va="top", transform=axs[j, i].transAxes,
-                    bbox=dict(facecolor='white', alpha=0.8, pad=0, edgecolor="none"),
+                    bbox=dict(facecolor='white', alpha=0.9, pad=0, edgecolor="none"),
                 )
                 axs[j, i].axline((0, 0), slope=1, linestyle="dashed", color="black")
             axs[0, i].set_xlim(SIZE_BOUNDS[0], SIZE_BOUNDS[1])
