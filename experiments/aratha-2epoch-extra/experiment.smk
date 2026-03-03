@@ -282,27 +282,36 @@ rule calculate_mse:
         cols = len(mode_estimates)
         rows = 2
         fig, axs = plt.subplots(
-            rows, cols, figsize=(cols * 4, rows * 4), 
+            rows, cols, figsize=(cols * 2.75, rows * 3), 
             constrained_layout=True,
+            sharey="row",
         )
         for i, k in enumerate(panels):
             for j in range(2):
                 mse = np.mean((true_values[:, j] - mode_estimates[k][:, j]) ** 2)
                 axs[j, i].plot(true_values[:, j], mode_estimates[k][:, j], "o", markersize=2)
                 axs[j, i].text(
-                    0.01, 0.99, f"mse: {mse:.3f}", 
+                    0.02, 0.98, f"mse: {mse:.3f}", 
                     ha="left", va="top", transform=axs[j, i].transAxes,
+                    bbox=dict(facecolor='white', alpha=0.9, pad=0, edgecolor="none"),
                 )
                 axs[j, i].axline((0, 0), slope=1, linestyle="dashed", color="black")
-                axs[j, i].set_title(labels[i])
             axs[0, i].set_xlim(SIZE_BOUNDS[0], SIZE_BOUNDS[1])
             axs[0, i].set_ylim(SIZE_BOUNDS[0], SIZE_BOUNDS[1])
+            axs[0, i].set_yticks([0.0, 0.3, 0.6, 0.9])
+            axs[0, i].set_xticks([0.0, 0.3, 0.6, 0.9])
             axs[1, i].set_xlim(TIME_BOUNDS[0], TIME_BOUNDS[1])
             axs[1, i].set_ylim(TIME_BOUNDS[0], TIME_BOUNDS[1])
-            axs[0, i].set_ylabel(r"$\nu$ (posterior mode)")
-            axs[1, i].set_ylabel(r"$T$ (posterior mode)")
-            axs[0, i].set_xlabel(r"$\nu$ (truth)")
-            axs[1, i].set_xlabel(r"$T$ (truth)")
+            axs[1, i].set_yticks([0.0, 0.4, 0.8, 1.2])
+            axs[1, i].set_xticks([0.0, 0.4, 0.8, 1.2])
+            # labels
+            axs[0, i].set_title(labels[i])
+            if i == 0:  # left panel
+                axs[0, i].set_ylabel(r"$\nu$ (posterior mode)", size=12)
+                axs[1, i].set_ylabel(r"$T$ (posterior mode)", size=12)
+            if i == 2:  # middle panel
+                axs[0, i].set_xlabel(r"$\nu$ (truth)", size=12)
+                axs[1, i].set_xlabel(r"$T$ (truth)", size=12)
         plt.savefig(output.mode_scatterplot)
         # mean estimates
         import matplotlib.pyplot as plt
@@ -310,8 +319,9 @@ rule calculate_mse:
         cols = len(mean_estimates)
         rows = 2
         fig, axs = plt.subplots(
-            rows, cols, figsize=(cols * 4, rows * 4), 
+            rows, cols, figsize=(cols * 2.75, rows * 3), 
             constrained_layout=True,
+            sharey="row",
         )
         prior_mean = np.array([np.mean(SIZE_BOUNDS), np.mean(TIME_BOUNDS)])
         for i, k in enumerate(panels):
@@ -320,22 +330,31 @@ rule calculate_mse:
                 baseline = np.mean((true_values[:, j] - prior_mean[j]) ** 2)
                 axs[j, i].plot(true_values[:, j], mean_estimates[k][:, j], "o", markersize=2)
                 axs[j, i].text(
-                    0.01, 0.99, f"mse: {mse:.3f}, prior-mse: {baseline:.3f}", 
+                    0.02, 0.98, f"mse: {mse:.3f}\nprior-mse: {baseline:.3f}", 
                     ha="left", va="top", transform=axs[j, i].transAxes,
+                    bbox=dict(facecolor='white', alpha=0.9, pad=0, edgecolor="none"),
                 )
                 axs[j, i].axline((0, 0), slope=1, linestyle="dashed", color="black")
-                axs[j, i].set_title(labels[i])
             axs[0, i].set_xlim(SIZE_BOUNDS[0], SIZE_BOUNDS[1])
             axs[0, i].set_ylim(SIZE_BOUNDS[0], SIZE_BOUNDS[1])
+            axs[0, i].set_yticks([0.0, 0.3, 0.6, 0.9])
+            axs[0, i].set_xticks([0.0, 0.3, 0.6, 0.9])
             axs[1, i].set_xlim(TIME_BOUNDS[0], TIME_BOUNDS[1])
             axs[1, i].set_ylim(TIME_BOUNDS[0], TIME_BOUNDS[1])
-            axs[0, i].set_ylabel(r"$\nu$ (posterior mean)")
-            axs[1, i].set_ylabel(r"$T$ (posterior mean)")
-            axs[0, i].set_xlabel(r"$\nu$ (truth)")
-            axs[1, i].set_xlabel(r"$T$ (truth)")
+            axs[1, i].set_yticks([0.0, 0.4, 0.8, 1.2])
+            axs[1, i].set_xticks([0.0, 0.4, 0.8, 1.2])
+            # labels
+            axs[0, i].set_title(labels[i])
+            if i == 0:  # left panel
+                axs[0, i].set_ylabel(r"$\nu$ (posterior mean)", size=12)
+                axs[1, i].set_ylabel(r"$T$ (posterior mean)", size=12)
+            if i == 2:  # middle panel
+                axs[0, i].set_xlabel(r"$\nu$ (truth)", size=12)
+                axs[1, i].set_xlabel(r"$T$ (truth)", size=12)
         plt.savefig(output.mean_scatterplot)
         # boxplots (posterior mean)
         import matplotlib.pyplot as plt
+        labels[1] = "abc-reject"  # shorten for boxpot
         plt.clf()
         cols = 2
         rows = 1
@@ -350,12 +369,15 @@ rule calculate_mse:
             errs_T.append(np.sqrt((true_values[:, 1] - mean_estimates[k][:, 1]) ** 2))
         axs[0].boxplot(errs_nu, tick_labels=labels, showfliers=False)
         axs[0].axhline(y=prior_mean[0], linestyle="dashed", color="black")
+        axs[0].text(0.55, prior_mean[0], "prior mean", color="black", va="bottom", ha="left")
         axs[0].set_title(r"Bottleneck severity ($\nu$)")
         axs[0].tick_params(axis='x', labelsize=8)
         axs[1].boxplot(errs_T, tick_labels=labels, showfliers=False)
         axs[1].axhline(y=prior_mean[1], linestyle="dashed", color="black")
+        axs[1].text(0.55, prior_mean[1], "prior mean", color="black", va="bottom", ha="left")
         axs[1].set_title(r"Bottleneck timing ($T$)")
         axs[1].tick_params(axis='x', labelsize=8)
+        axs[1].set_ylim(0, 0.8)
         fig.supylabel("|posterior mean - truth|")
         plt.savefig(output.mean_boxplot)
         # boxplots (posterior mode)
@@ -374,12 +396,15 @@ rule calculate_mse:
             errs_T.append(np.sqrt((true_values[:, 1] - mode_estimates[k][:, 1]) ** 2))
         axs[0].boxplot(errs_nu, tick_labels=labels, showfliers=False)
         axs[0].axhline(y=prior_mean[0], linestyle="dashed", color="black")
+        axs[0].text(0.55, prior_mean[0], "prior mean", color="black", va="bottom", ha="left")
         axs[0].set_title(r"Bottleneck severity ($\nu$)")
         axs[0].tick_params(axis='x', labelsize=8)
         axs[1].boxplot(errs_T, tick_labels=labels, showfliers=False)
         axs[1].axhline(y=prior_mean[1], linestyle="dashed", color="black")
+        axs[1].text(0.55, prior_mean[1], "prior mean", color="black", va="bottom", ha="left")
         axs[1].set_title(r"Bottleneck timing ($T$)")
         axs[1].tick_params(axis='x', labelsize=8)
+        axs[1].set_ylim(0, 0.8)
         fig.supylabel("|posterior mode - truth|")
         plt.savefig(output.mode_boxplot)
             

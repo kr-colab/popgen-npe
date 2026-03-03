@@ -9,5 +9,5 @@ PWD=`dirname $PWD`
 
 # coverage experiment and figures
 snakemake --jobs 10 --configfile $PWD/experiment-config.yaml \
-  --snakefile $PWD/experiment.smk -R calculate_mse
+  --snakefile $PWD/experiment.smk
 
