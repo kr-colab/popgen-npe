@@ -110,7 +110,7 @@ rule calculate_coverage:
         alpha_grid = np.linspace(0.0, 0.5, grid_size + 2)[1:-1]
         true_values = []
         coverage = None
-        required_methods = ["MomentsGodambe", "ExchangeableCNN", "RNN", "SummaryStatisticsEmbedding", "ABC-Rejection"]
+        required_methods = ["MomentsGodambe", "ABC-Rejection", "SummaryStatisticsEmbedding", "ExchangeableCNN", "RNN"]
         for file in input.done:
             base = os.path.dirname(file)
             for line in open(file.removesuffix(".done") + ".txt"):
@@ -241,7 +241,7 @@ rule calculate_mse:
         import pickle
         true_values = []
         mode_estimates = None
-        required_methods = ["MomentsGodambe", "ExchangeableCNN", "RNN", "SummaryStatisticsEmbedding", "ABC-Rejection"]
+        required_methods = ["MomentsGodambe", "ABC-Rejection", "SummaryStatisticsEmbedding", "ExchangeableCNN", "RNN"]
         for file in input.done:
             base = os.path.dirname(file)
             for line in open(file.removesuffix(".done") + ".txt"):
@@ -273,6 +273,9 @@ rule calculate_mse:
         for k in mode_estimates: mode_estimates[k] = np.array(mode_estimates[k])
         for k in mean_estimates: mean_estimates[k] = np.array(mean_estimates[k])
         true_values = np.array(true_values)
+        # all plots below share the column ordering:
+        panels = required_methods
+        labels = ["moments-sfs", "abc-rejection", "npe-sfs", "npe-cnn", "npe-rnn"]
         # mode estimates
         import matplotlib.pyplot as plt
         plt.clf()
@@ -282,8 +285,6 @@ rule calculate_mse:
             rows, cols, figsize=(cols * 4, rows * 4), 
             constrained_layout=True,
         )
-        panels = ["MomentsGodambe", "ExchangeableCNN", "RNN", "SummaryStatisticsEmbedding", "ABC-Rejection"]
-        labels = ["moments-SFS", "npe-CNN", "npe-RNN", "npe-SFS", "ABC-rejection"]
         for i, k in enumerate(panels):
             for j in range(2):
                 mse = np.mean((true_values[:, j] - mode_estimates[k][:, j]) ** 2)
@@ -313,8 +314,6 @@ rule calculate_mse:
             constrained_layout=True,
         )
         prior_mean = np.array([np.mean(SIZE_BOUNDS), np.mean(TIME_BOUNDS)])
-        panels = ["MomentsGodambe", "ExchangeableCNN", "RNN", "SummaryStatisticsEmbedding", "ABC-Rejection"]
-        labels = ["moments-SFS", "npe-CNN", "npe-RNN", "npe-SFS", "ABC-rejection"]
         for i, k in enumerate(panels):
             for j in range(2):
                 mse = np.mean((true_values[:, j] - mean_estimates[k][:, j]) ** 2)
@@ -344,8 +343,6 @@ rule calculate_mse:
             rows, cols, figsize=(cols * 4, rows * 4), 
             constrained_layout=True, sharey=True,
         )
-        panels = ["MomentsGodambe", "ExchangeableCNN", "RNN", "SummaryStatisticsEmbedding", "ABC-Rejection"]
-        labels = ["moments-SFS", "npe-CNN", "npe-RNN", "npe-SFS", "ABC-rejection"]
         errs_nu = []
         errs_T = []
         for i, k in enumerate(panels):
@@ -370,8 +367,6 @@ rule calculate_mse:
             rows, cols, figsize=(cols * 4, rows * 4), 
             constrained_layout=True, sharey=True,
         )
-        panels = ["MomentsGodambe", "ExchangeableCNN", "RNN", "SummaryStatisticsEmbedding", "ABC-Rejection"]
-        labels = ["moments-SFS", "npe-CNN", "npe-RNN", "npe-SFS", "ABC-rejection"]
         errs_nu = []
         errs_T = []
         for i, k in enumerate(panels):

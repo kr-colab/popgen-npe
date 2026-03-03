@@ -33,7 +33,8 @@ import abc_utils
 if torch.cuda.is_available():
     # Assign GPU based on process ID to distribute load
     num_gpus = torch.cuda.device_count()
-    gpu_id = os.getpid() % num_gpus
+    #gpu_id = os.getpid() % num_gpus
+    gpu_id = 2  # hardcoding as automatic selection always gets '0'
     device = f"cuda:{gpu_id}"
     # Set as default device to avoid device mismatch errors in sbi
     torch.cuda.set_device(gpu_id)

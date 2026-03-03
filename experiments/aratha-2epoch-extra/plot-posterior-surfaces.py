@@ -35,7 +35,7 @@ cols = len(
 )
 fig, axs = plt.subplots(
     rows, cols, 
-    figsize=(cols * 2, rows * 2), 
+    figsize=(cols * 2, rows * 1.85), 
     constrained_layout=True, 
     sharex=True,
     sharey=True,
@@ -67,7 +67,7 @@ for j, inpath in enumerate(args.inpaths):
         )
         axs[j, i].plot(*params, "o", color="red", markersize=4)
         if j == 0: axs[j, i].set_title(labels[name])
-        #plt.colorbar(img, ax=axs[j, i], label="log posterior")
+fig.colorbar(img, ax=axs, label="log posterior probability", fraction=0.02, pad=0.01) 
 fig.supxlabel(r"Bottleneck severity ($\nu$)")
 fig.supylabel(r"Time of bottleneck ($T$)")
 plt.savefig(f"{args.outpath}")
