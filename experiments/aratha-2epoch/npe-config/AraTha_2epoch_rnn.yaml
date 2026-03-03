@@ -34,8 +34,6 @@ simulator:
   class_name: "AraTha_2epoch"
   # OPTIONAL CLASS KWARGS:
   sequence_length: 100000
-  mutation_rate: 1.5e-8
-  recombination_rate: 1.5e-8
   samples:
     SouthMiddleAtlas: 10
 
