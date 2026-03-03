@@ -196,8 +196,8 @@ rule calculate_coverage:
             ax.set_xlim(0, 1)
             ax.set_ylim(0, 1)
             ax.legend()
-        axs[0].set_title(r"$\nu$ (AraTha_2epoch)")
-        axs[1].set_title(r"$T$ (AraTha_2epoch)")
+        axs[0].set_title(r"Bottleneck severity $\nu$")
+        axs[1].set_title(r"Bottleneck timing $T$")
         fig.supxlabel("Expected coverage")
         fig.supylabel("Empirical coverage")
         plt.savefig(output.coverage_plot)
@@ -219,8 +219,8 @@ rule calculate_coverage:
             ax.set_ylim(0, 1)
             ax.set_xlim(0, 1)
             ax.legend()
-        axs[0].set_title(r"$\nu$ (AraTha_2epoch)")
-        axs[1].set_title(r"$T$ (AraTha_2epoch)")
+        axs[0].set_title(r"Bottleneck severity $\nu$")
+        axs[1].set_title(r"Bottleneck timing $T$")
         fig.supxlabel("Expected coverage")
         fig.supylabel("Posterior/prior interval width")
         plt.savefig(output.concentr_plot)
@@ -310,8 +310,8 @@ rule calculate_mse:
                 axs[0, i].set_ylabel(r"$\nu$ (posterior mode)", size=12)
                 axs[1, i].set_ylabel(r"$T$ (posterior mode)", size=12)
             if i == 2:  # middle panel
-                axs[0, i].set_xlabel(r"$\nu$ (truth)", size=12)
-                axs[1, i].set_xlabel(r"$T$ (truth)", size=12)
+                axs[0, i].set_xlabel(r"Bottleneck severity $\nu$ (truth)", size=12)
+                axs[1, i].set_xlabel(r"Bottleneck timing $T$ (truth)", size=12)
         plt.savefig(output.mode_scatterplot)
         # mean estimates
         import matplotlib.pyplot as plt
@@ -349,8 +349,8 @@ rule calculate_mse:
                 axs[0, i].set_ylabel(r"$\nu$ (posterior mean)", size=12)
                 axs[1, i].set_ylabel(r"$T$ (posterior mean)", size=12)
             if i == 2:  # middle panel
-                axs[0, i].set_xlabel(r"$\nu$ (truth)", size=12)
-                axs[1, i].set_xlabel(r"$T$ (truth)", size=12)
+                axs[0, i].set_xlabel(r"Bottleneck severity $\nu$ (truth)", size=12)
+                axs[1, i].set_xlabel(r"Bottleneck timing $T$ (truth)", size=12)
         plt.savefig(output.mean_scatterplot)
         # boxplots (posterior mean)
         import matplotlib.pyplot as plt
