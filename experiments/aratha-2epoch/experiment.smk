@@ -377,7 +377,6 @@ rule calculate_mse:
         axs[1].text(0.55, prior_mean[1], "prior mean", color="black", va="bottom", ha="left")
         axs[1].set_title(r"Bottleneck timing ($T$)")
         axs[1].tick_params(axis='x', labelsize=8)
-        axs[1].set_ylim(0, 0.8)
         fig.supylabel("|posterior mean - truth|")
         plt.savefig(output.mean_boxplot)
         # boxplots (posterior mode)
@@ -404,7 +403,6 @@ rule calculate_mse:
         axs[1].text(0.55, prior_mean[1], "prior mean", color="black", va="bottom", ha="left")
         axs[1].set_title(r"Bottleneck timing ($T$)")
         axs[1].tick_params(axis='x', labelsize=8)
-        axs[1].set_ylim(0, 0.8)
         fig.supylabel("|posterior mode - truth|")
         plt.savefig(output.mode_boxplot)
             
