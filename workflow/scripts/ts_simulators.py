@@ -378,51 +378,6 @@ class recombination_rate(BaseSimulator):
         return ts, theta
 
 
-class MutRecRate(BaseSimulator):
-    """
-    Constant-size population with variable mutation and recombination rates.
-    Designed for windowed estimation of rate landscapes: train on single
-    windows with constant rates, then predict per-window on real data.
-    """
-
-    default_config = {
-        # Fixed parameters
-        "samples": {"pop": 20},
-        "sequence_length": 500000,
-        "pop_size": 10000,
-        # Random parameters — [low, high] uniform prior bounds
-        "recombination_rate": [1e-9, 1e-7],
-        "mutation_rate": [1e-9, 1e-7],
-    }
-
-    def __init__(self, config: dict):
-        super().__init__(config, self.default_config)
-        self.parameters = ["recombination_rate", "mutation_rate"]
-        self.prior = BoxUniform(
-            low=torch.tensor([self.recombination_rate[0], self.mutation_rate[0]]),
-            high=torch.tensor([self.recombination_rate[1], self.mutation_rate[1]]),
-        )
-
-    def __call__(self, seed: int = None) -> (tskit.TreeSequence, np.ndarray):
-        torch.manual_seed(seed)
-        theta = self.prior.sample().numpy()
-        recomb_rate, mut_rate = theta
-
-        demography = msprime.Demography()
-        demography.add_population(name="pop", initial_size=self.pop_size)
-
-        ts = msprime.sim_ancestry(
-            samples={"pop": self.samples["pop"]},
-            demography=demography,
-            sequence_length=self.sequence_length,
-            recombination_rate=recomb_rate,
-            random_seed=seed,
-        )
-        ts = msprime.sim_mutations(ts, rate=mut_rate, random_seed=seed)
-
-        return ts, theta
-
-
 class DependentVariablePopulationSize(BaseSimulator):
     """
     Simulate a population with variable population size across multiple time windows, with each
