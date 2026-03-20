@@ -377,10 +377,9 @@ class recombination_rate(BaseSimulator):
 
         return ts, theta
 
-
 class DependentVariablePopulationSize(BaseSimulator):
     """
-    Simulate a population with variable population size across multiple time windows, with each
+    Simulate a population with variable population size across multiple time windows, with each 
     population size dependent on the previous one.
     The model consists of a single population that undergoes multiple size changes.
     """
