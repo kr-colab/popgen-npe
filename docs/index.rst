@@ -6,6 +6,7 @@ Welcome to popgen-npe's documentation!
    :caption: Contents:
 
    installation
+   tutorial
    usage
    simulators
    processors
