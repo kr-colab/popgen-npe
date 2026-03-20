@@ -1,9 +1,9 @@
 Soup-to-Nuts Tutorial: Rate Landscape Estimation
 ==================================================
 
-In this tutorial you will build a complete simulation-based inference pipeline
-that estimates **mutation rate** and **recombination rate** across a genome.
-By the end you will have:
+In this tutorial we will build a complete simulation-based inference pipeline
+that estimates mutation rate and recombination rate across a genomic region.
+By the end we will have:
 
 - A custom **simulator** that generates tree sequences under a constant-size
   population model with two free parameters (recombination rate and mutation
@@ -12,10 +12,10 @@ By the end you will have:
   embedding network
 - A trained neural posterior estimator
 - **Windowed posterior estimates** of both rates across a simulated genome
-  with known, spatially varying rate landscapes — so you can check that the
+  with known, spatially varying rate landscapes, so we can check that the
   model recovers the ground truth
 
-The key insight is that training uses windows with *constant* rates (drawn
+In this example training uses windows with *constant* rates (drawn
 from a prior), while prediction applies the trained model window-by-window
 to a VCF where rates *vary spatially* — producing a rate landscape.
 
@@ -30,7 +30,7 @@ to a VCF where rates *vary spatially* — producing a rate landscape.
    dotted lines mark chromosome boundaries.
 
 .. note::
-   With 5 000 training simulations and the default config, the full
+   With 5,000 training simulations and the default config, the full
    tutorial (training + prediction) takes about **15 minutes** on a machine
    with an NVIDIA A100 GPU using 4 cores. Simulation is the bottleneck; on
    a cluster you can parallelize it further with ``n_chunk``. Training on
@@ -50,7 +50,7 @@ What we are building
 
 .. code-block:: text
 
-   Files you will create
+   Files we will create
    ─────────────────────
    workflow/
    ├── scripts/
@@ -72,7 +72,7 @@ What we are building
 Step 1: Write the simulator
 ----------------------------
 
-Open ``workflow/scripts/ts_simulators.py`` and add the following class.
+Open ``workflow/scripts/ts_simulators.py`` in your favorite editor and add the following class.
 
 The simulator API
 ^^^^^^^^^^^^^^^^^
@@ -97,7 +97,7 @@ Full code listing
    class MutRecRate(BaseSimulator):
        """
        Constant-size population with variable mutation and recombination
-       rates.  Designed for windowed estimation of rate landscapes: train
+       rates. Designed for windowed estimation of rate landscapes we train
        on single windows with constant rates, then predict per-window on
        real data.
        """
@@ -148,7 +148,7 @@ Full code listing
   samples, diagnostic plots), so it must be consistent.
 - ``BoxUniform`` (from ``sbi.utils``) is already imported at the top of
   ``ts_simulators.py``.
-- The population is named ``"pop"`` (a string, not an integer) — this is
+- The population here is named ``"pop"`` (a string, not an integer) — this is
   required for the prediction pipeline's population-name matching to work.
 - The ``sequence_length`` (500 kb) matches the window size in the BED file
   used for prediction. Training windows and prediction windows must be the
@@ -175,7 +175,7 @@ Step 2: Configure the processor
 
 We use the built-in ``cnn_extract`` processor, which converts a tree sequence
 into a genotype matrix suitable for a convolutional neural network. No new code
-is needed.
+is needed here, but one can introduce there own custom processors.
 
 ``cnn_extract`` produces an array of shape ``(2, n_individuals, n_snps)`` for a
 single population. The two channels are SNP positions and genotype values. The
@@ -222,7 +222,7 @@ below. Every field is annotated.
    # subdirectory.  Change this to wherever you want results written.
    project_dir: "/path/to/your/project/dir"
 
-   # ── Resource allocation ──────────────────────────────────────────
+   # ── Resource allocation, if you want to run on a slurm cluster
    cpu_resources:
      runtime: "2h"
      mem_mb: 16000
@@ -231,7 +231,7 @@ below. Every field is annotated.
      runtime: "4h"
      mem_mb: 50000
      gpus: 1
-     slurm_partition: "gpu"
+     slurm_partition: "gpu"        
      slurm_extra: "--gres=gpu:1"
 
    # ── Simulation settings ──────────────────────────────────────────
@@ -285,7 +285,7 @@ below. Every field is annotated.
      windows: "example_data/MutRecRate/windows.bed"
      min_snps_per_window: 10
 
-**Field-by-field notes:**
+**What are all these yaml fields anyway? Some explanation:**
 
 - ``project_dir`` — the workflow creates a subdirectory named
   ``MutRecRate-cnn_extract-ExchangeableCNN-42-5000-sep`` under this path
@@ -296,7 +296,7 @@ below. Every field is annotated.
   ``n_chunk: 1`` or ``2`` is fine; on a cluster you can go much higher.
 - ``train_embedding_net_separately: True`` means the CNN embedding is
   pre-trained, then the normalizing flow is trained on the learned
-  embeddings.  This is generally more stable than end-to-end training.
+  embeddings.  This is can be more stable than end-to-end training.
 - ``sequence_length: 500000`` — this **must match** the window size in
   ``windows.bed``. Training windows and prediction windows must be the
   same size so the network sees the same scale of data.
@@ -318,13 +318,13 @@ From the repository root:
 
 .. tip::
    On a local machine with no GPU, training will still work (PyTorch falls
-   back to CPU) but will be slower. With 5 000 training simulations and the
-   network sizes above, expect roughly 10–30 minutes on a modern laptop.
+   back to CPU) but will be slower. With 5,000 training simulations and the
+   network sizes above, expect roughly 10–30 minutes depending on your machine.
 
 What happens
 ^^^^^^^^^^^^
 
-The workflow executes these stages in order:
+The workflow runs these stages in order:
 
 1. **Setup** — creates the Zarr data store and divides the simulations into
    chunks.
@@ -335,7 +335,7 @@ The workflow executes these stages in order:
    storing the resulting tensors in Zarr.
 4. **Train embedding network** — trains the ``ExchangeableCNN`` to produce
    useful summary statistics from genotype matrices.
-5. **Train normalizing flow** — trains an ``sbi`` neural posterior estimator
+5. **Train normalizing flow** — trains a neural posterior estimator
    conditioned on the learned embeddings.
 6. **Diagnostics** — generates posterior calibration, concentration, and
    simulation summary plots.
@@ -369,10 +369,10 @@ Inspecting results
 
 The diagnostic plots are the quickest way to check that inference is working:
 
-- **posterior_calibration.png** — SBC rank histograms; uniform bars indicate
-  well-calibrated posteriors.
-- **posterior_concentration.png** — shows how posterior width decreases with
-  more informative data.
+- **posterior_calibration.png** — simulation-based calibration plot; points 
+  falling on the diagonal indicate well-calibrated posteriors.
+- **posterior_concentration.png** — shows how ratio of posterior to prior width
+  change as a function of coverage for each parameter.
 - **posterior_expectation.png** — posterior means vs. true parameter values;
   points near the diagonal mean the model is recovering the parameters.
 - **posterior_at_prior_mean.png / _low.png / _high.png** — posterior
@@ -461,7 +461,7 @@ What the prediction workflow does
 4. **Process** — applies the same ``cnn_extract`` processor to each inferred
    tree sequence.
 5. **Predict** — loads the trained embedding network and normalizing flow,
-   and draws 1 000 posterior samples per window.
+   and draws 1,000 posterior samples per window.
 6. **Diagnostics** — generates summary plots.
 
 Prediction output
