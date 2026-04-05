@@ -2,6 +2,7 @@
 
 [![Snakemake](https://img.shields.io/badge/snakemake-≥6.3.0-brightgreen.svg)](https://snakemake.github.io)
 [![Read the Docs](https://img.shields.io/readthedocs/pip/stable.svg)](https://popgen-npe.readthedocs.io/en/latest/)
+[![bioRxiv](https://img.shields.io/endpoint?url=https%3A%2F%2Fandrewkern.github.io%2Fbiorxiv-badge%2Fbadges%2F10.64898__2025.12.01.691638.json)](https://doi.org/10.64898/2025.12.01.691638)
 
 
 
