@@ -2,6 +2,9 @@ import os
 import logging
 import numpy as np
 import torch
+# make macOS behave like Linux (use fork rather than spawn)
+import multiprocessing
+multiprocessing.set_start_method("fork", force=True)
 
 from torch.utils.data import DataLoader
 from lightning.pytorch.loggers import TensorBoardLogger, CSVLogger
@@ -25,6 +28,9 @@ if torch.cuda.is_available():
     best_gpu = get_least_busy_gpu()
     device = f"cuda:{best_gpu}"
     devices = [best_gpu]  # Set devices to the least busy GPU
+elif torch.mps.is_available():
+    device = "mps"
+    devices = 1  # Single MPS device
 else:
     device = "cpu"
     devices = 1  # Ensure CPU compatibility
@@ -172,7 +178,7 @@ precision = "16-mixed" if device.startswith("cuda") else "32"
 
 trainer = Trainer(
     max_epochs=snakemake.params.max_num_epochs,
-    accelerator="gpu" if device.startswith("cuda") else "cpu",
+    accelerator="gpu" if device.startswith("cuda") else "mps" if device == "mps" else "cpu",
     devices=devices,
     default_root_dir=os.path.dirname(snakemake.output.network),
     gradient_clip_val=snakemake.params.clip_max_norm,

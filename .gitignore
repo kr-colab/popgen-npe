@@ -5,3 +5,5 @@
 __pycache__
 example_data/*
 !example_data/MutRecRate/
+popgen_npe.egg-info/*
+MutRecRate/*

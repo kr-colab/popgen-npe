@@ -31,3 +31,5 @@ dependencies = [
 
 [tool.uv]
 extra-index-url = ["https://download.pytorch.org/whl/cu118"]
+[tool.setuptools]
+py-modules = []

@@ -1,0 +1,67 @@
+# ── Project location ─────────────────────────────────────────────
+# All outputs go under this directory, inside a UID-based
+# subdirectory.  Change this to wherever you want results written.
+project_dir: "/Users/jiseonmin/popgen"
+
+# ── Resource allocation, if you want to run on a slurm cluster
+cpu_resources:
+  runtime: "2h"
+  mem_mb: 16000
+
+gpu_resources:
+  runtime: "4h"
+  mem_mb: 50000
+  gpus: 1
+  slurm_partition: "gpu"
+  slurm_extra: "--gres=gpu:1"
+
+# ── Simulation settings ──────────────────────────────────────────
+random_seed: 42
+n_chunk: 10          # number of parallel simulation jobs
+n_train: 5000        # training simulations
+n_val: 500           # validation simulations
+n_test: 500          # test simulations (used for diagnostics)
+
+# ── Training hyperparameters ─────────────────────────────────────
+train_embedding_net_separately: True   # two-stage training
+use_cache: True                        # load features into CPU memory
+optimizer: "Adam"
+batch_size: 64
+learning_rate: 0.0005
+max_num_epochs: 200
+stop_after_epochs: 50       # early stopping patience
+clip_max_norm: 5
+packed_sequence: False
+
+# ── Simulator ────────────────────────────────────────────────────
+# class_name must match the class you added to ts_simulators.py.
+# sequence_length must equal the window size in the BED file.
+simulator:
+  class_name: "MutRecRate"
+  samples:
+    pop: 20
+  sequence_length: 500000
+  pop_size: 10000
+
+# ── Processor ────────────────────────────────────────────────────
+processor:
+  class_name: "cnn_extract"
+  n_snps: 1000
+  maf_thresh: 0.0
+
+# ── Embedding network ────────────────────────────────────────────
+# input_rows: number of individuals per population (list, one per pop)
+# input_cols: number of SNPs per population (list, one per pop)
+embedding_network:
+  class_name: "ExchangeableCNN"
+  output_dim: 64
+  input_rows: [20]
+  input_cols: [1000]
+
+# ── Prediction ───────────────────────────────────────────────────
+prediction:
+  n_chunk: 5
+  vcf: "example_data/MutRecRate/test.vcf.gz"
+  population_map: "example_data/MutRecRate/popmap.yaml"
+  windows: "example_data/MutRecRate/windows.bed"
+  min_snps_per_window: 10

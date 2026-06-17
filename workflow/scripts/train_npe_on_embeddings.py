@@ -19,6 +19,9 @@ if torch.cuda.is_available():
     best_gpu = get_least_busy_gpu()
     device = f"cuda:{best_gpu}"
     devices = [best_gpu]  # Set devices to the least busy GPU
+elif torch.mps.is_available():
+    device = "mps"
+    devices = 1  # Single MPS device
 else:
     device = "cpu"
     devices = 1  # Ensure CPU compatibility
@@ -35,7 +38,7 @@ class Model(LightningModule):
 
 embedding_model = Model()
 trainer = Trainer(
-    accelerator="gpu" if device.startswith("cuda") else "cpu",
+    accelerator="gpu" if device.startswith("cuda") else "mps" if device == "mps" else "cpu",
     devices=devices,
     default_root_dir=os.path.dirname(snakemake.input.network),
     logger=False,
@@ -124,7 +127,7 @@ stop_early = EarlyStopping(
 )
 trainer = Trainer(
     max_epochs=snakemake.params.max_num_epochs,
-    accelerator="gpu" if device.startswith("cuda") else "cpu",
+    accelerator="gpu" if device.startswith("cuda") else "mps" if device == "mps" else "cpu",
     devices=devices,
     default_root_dir=os.path.dirname(snakemake.output.network),
     gradient_clip_val=snakemake.params.clip_max_norm,
