@@ -4,6 +4,8 @@ import torch
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+import multiprocessing
+multiprocessing.set_start_method("fork", force=True)
 
 from torch import Tensor
 from torch.utils.data import DataLoader

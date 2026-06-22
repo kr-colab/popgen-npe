@@ -1,6 +1,8 @@
 import os
 import numpy as np
 import torch
+import multiprocessing
+multiprocessing.set_start_method("fork", force=True)
 
 from torch.utils.data import DataLoader
 from lightning.pytorch.loggers import TensorBoardLogger
@@ -26,7 +28,7 @@ else:
 class Model(LightningModule):
     def __init__(self):
         super().__init__()
-        self.embedding_net = torch.load(snakemake.input.network)
+        self.embedding_net = torch.load(snakemake.input.network, weights_only=False)
 
     def predict_step(self, data):
         target, features = data

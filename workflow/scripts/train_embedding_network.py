@@ -2,6 +2,8 @@ import os
 import logging
 import numpy as np
 import torch
+import multiprocessing
+multiprocessing.set_start_method("fork", force=True)
 
 from torch.utils.data import DataLoader
 from lightning.pytorch.loggers import TensorBoardLogger, CSVLogger
