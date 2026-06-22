@@ -27,13 +27,14 @@ for i in indices:
     left, right = root.window_left[i], root.window_right[i]
     contig = root.window_contig[i]
     site_mask[start:end] = False
-    # implicitly uses `individuals_population`, `populations_metadata` from vcz
+    # `individuals_population` is None by default, so needs to be defined explicitly.
     variant_data = tsinfer.VariantData(
         vcz,
         sample_mask=sample_mask,
         site_mask=site_mask,
         ancestral_state=vcz.ancestral_state.get_mask_selection(~site_mask),
         sequence_length=vcz.contig_length[contig],
+        individuals_population=sample_population,
     )
     its = tsinfer.infer(
         variant_data, 
