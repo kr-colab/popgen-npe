@@ -1,0 +1,54 @@
+project_dir: "/scratch/j.min/popgen-npe-out"
+
+cpu_resources:
+  runtime: "2h"
+  mem_mb: 16000
+  slurm_partition: "short"
+
+gpu_resources:
+  runtime: "4h"
+  mem_mb: 50000
+  gres: "gpu:1"
+  slurm_partition: "gpu"
+
+random_seed: 42
+n_chunk: 10
+n_train: 5000
+n_val: 500
+n_test: 500
+
+train_embedding_net_separately: True
+use_cache: True
+optimizer: "Adam"
+batch_size: 64
+learning_rate: 0.0005
+max_num_epochs: 200
+stop_after_epochs: 50
+clip_max_norm: 5
+packed_sequence: False
+
+simulator:
+  class_name: "MutRecRate"
+  samples:
+    pop: 20
+  sequence_length: 500000
+  pop_size: 10000
+
+processor:
+  class_name: "cnn_extract"
+  n_snps: 1000
+  maf_thresh: 0.0
+
+embedding_network:
+  class_name: "ExchangeableCNN"
+  output_dim: 64
+  input_rows: [20]
+  input_cols: [1000]
+
+prediction:
+  n_chunk: 5
+  vcf: "example_data/MutRecRate/test.vcf.gz"
+  population_map: "example_data/MutRecRate/popmap.yaml" 
+  windows: "example_data/MutRecRate/windows.bed"
+  min_snps_per_window: 10
+
